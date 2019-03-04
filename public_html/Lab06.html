@@ -1,0 +1,17 @@
+<html>
+	<head>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+		<script>
+			function updateText(n) {
+				var data = $('#'+n).val();
+				$('#t'+n).text(data);
+			}
+			
+		</script>
+	</head>
+	<body>
+		<input id="1" placeholder="String 1" onkeyup="updateText(1)" onkeydown="updateText(1)"/>
+		<input id ="2" placeholder="String 2" onkeyup="updateText(2)" onkeydown="updateText(2)"/><br/>
+		<span id="t1"></span> : <span id="t2"></span>
+	</body>
+</html>
