@@ -1,0 +1,37 @@
+<html>
+	<head>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+		<script>
+			function checkConfirm() {
+				if($("#pass").val() == $("#confirmpass").val() && $("#pass").val().length > 3) {
+					$("#submit").prop("disabled",false);
+					$("#confirmpass").css("outline","1px solid green");
+				} 
+				else {
+					$("#submit").prop("disabled",true);
+					$("#confirmpass").css("outline","1px solid red");
+				}
+			}
+			
+			function sendRequest() {
+				$.post( "../../e/bhatts39/lab7", { user: $("#user").val(), pass: $("#pass").val() }, function( data ) {
+					alert(data)
+				});
+			}
+		</script>
+		<style>
+			input,button {
+				margin: 5px;
+			}
+		</style>
+	</head>
+	<body>
+		<h2> Login</h2>
+		<div>
+			<input type="text" id="user" placeholder="Username" name="user"/><br>
+			<input type="password" id="pass" placeholder="Password" name="pass" onkeyup="checkConfirm()"/><br>
+			<input type="password" id="confirmpass" placeholder="Confirm Password" onkeyup="checkConfirm()"/><br>
+			<button id="submit" onclick="sendRequest()" disabled>Submit</button>
+		</div>
+	</body>
+</html>

@@ -1,0 +1,7 @@
+  GNU nano 2.5.3                        File: views.py
+
+from django.shortcuts import render
+
+# Create your views here.
+
+
