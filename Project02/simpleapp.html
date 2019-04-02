@@ -1,0 +1,53 @@
+<html>
+	<head>
+		<title>Tic-Tac-Toe</title>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"/>
+		<link rel="stylesheet" type="text/css" href="style.css"/>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+		<script src="script.js"></script>
+		<audio id="X"><source src="sounds/X.mp3" type="audio/mp3"></audio>
+		<audio id="O"><source src="sounds/O.mp3" type="audio/mp3"></audio>
+		<audio id="clear"><source src="sounds/clear.mp3" type="audio/mp3"></audio>
+	</head>
+	<body>
+		<div class="container text-center">
+			<table>
+				<tr>
+					<td id="0"></td>
+					<td id="1"></td>
+					<td id="2"></td>
+				</tr>
+				<tr>
+					<td id="3"></td>
+					<td id="4"></td>
+					<td id="5"></td>
+				</tr>
+				<tr>
+					<td id="6"></td>
+					<td id="7"></td>
+					<td id="8"></td>
+				</tr>
+			</table>
+		</div>
+		<div class="playagain footer bg-white py-4 text-dark w-100 text-center" style="position:fixed;bottom:0;cursor:hand">
+			<div class="h2">Restart Game</div>
+		</div>
+		<div class="modal fade" id="modal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+		  <div class="modal-dialog" role="document">
+			<div class="modal-content">
+			  <div class="modal-header">
+				<h5 class="modal-title" id="modalLabel"></h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+				  <span aria-hidden="true">&times;</span>
+				</button>
+			  </div>
+			  <div class="modal-footer">
+				<button type="button" data-dismiss="modal" class="playagain btn btn-info">Play again</button>
+				<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+			  </div>
+			</div>
+		  </div>
+		</div>
+	</body>
+</html>
