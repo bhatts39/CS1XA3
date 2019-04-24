@@ -9,42 +9,57 @@ from trivia.models import *
 from django.core.serializers import serialize
 from django.core.exceptions import ObjectDoesNotExist
 import requests, time, json, random
+from django.views.decorators.csrf import csrf_exempt
 
 
 def home_view(request):
     if(request.user.is_authenticated):
-        return render(request,'home.html',{'user':request.user})
+        return render(request,'home.html')
     else:
         return redirect('login')
 
 def login_view(request):
-     return render(request,'login.html')
+    if(not request.user.is_authenticated):
+        return render(request,'login.html')
+    else:
+        return redirect('../')
 
 def register_view(request):
-    return render(request,'register.html')
-
-def login_api_view(request):
-    username = request.GET['username']
-    password = request.GET['password']
-    user = authenticate(request, username=username, password=password)
-    if user is not None:
-        login(request, user)
-        return HttpResponse("success")
+    if(not request.user.is_authenticated):
+        return render(request,'register.html')
     else:
-        return HttpResponse("fail")
-        
-def logout_api_view(request):
-    logout(request)
-    return HttpResponse("logged out")
+        return redirect('../')
 
+def logout_view(request):
+    logout(request)
+    return redirect('../')
+
+@csrf_exempt
+def login_api_view(request):
+    if(not request.user.is_authenticated):
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            return JsonResponse({'result':'success'})
+        else:
+            return JsonResponse({'result':'fail'})
+
+@csrf_exempt
 def register_api_view(request):
-    username = request.GET['username']
-    password = request.GET['password']
-    email = request.GET['email']
-    user = User.objects.create_user(username, email, password)
-    user.info.score = 0
-    user.save()
-    return HttpResponse("success")
+    if(not request.user.is_authenticated):
+        username = request.POST['username']
+        password = request.POST['password']
+        email = request.POST['email']
+        try:
+            user = User.objects.create_user(username, email, password)
+        except:
+            return JsonResponse({'result':'fail'})
+        user.info.score = 0
+        user.save()
+        login(request, user)
+        return JsonResponse({'result':'success'})
         
 def findgame_view(request):
     if(request.user.is_authenticated):

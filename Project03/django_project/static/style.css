@@ -1,3 +1,43 @@
-.test {
-    height: 5;
+body,html {
+    background-color: #14b78e;
+    font-family: 'Roboto', sans-serif;
+}
+
+.box-shadow {
+    box-shadow: 0 0 5px 0px rgba(0,0,0,0.2);
+}
+
+.form-control{
+    color: #999 !important;
+    height: 41px;
+    background-color: #f2f2f2;
+    box-shadow: none !important;
+    border: none;
+    transition: all 500ms ease;
+}
+.form-control:focus{
+    background: #e2e2e2;
+}
+.form-control-error {
+    background-color: #ee8080 !important;
+    transition: all 150ms ease;
+}
+
+.form-control::placeholder {
+    font-size: 15px;
+    color: #999;
+}
+
+.btn {
+    background: #14b78e !important;
+    transition: all 500ms ease;
+}
+
+.btn:hover{
+    background: #0d8164 !important;
+}
+
+a {
+    color: white !important;
+    text-decoration: underline;
 }
