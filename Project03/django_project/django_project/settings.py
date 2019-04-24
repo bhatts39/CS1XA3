@@ -121,7 +121,7 @@ USE_TZ = True
 STATIC_URL = '/e/bhatts39/static/' 
     # url to automatically access static files from
 STATICFILES_DIRS = [
-    "/home/bhatts39/CS1XA3/public_html/trivia",
+    "/home/bhatts39/CS1XA3/Project03/django_project/static",
     # paths to collect static files from
 ]
-STATIC_ROOT = "/home/bhatts39/CS1XA3/django_project/static/"
+STATIC_ROOT = "/home/bhatts39/CS1XA3/Project03/django_project/trivia/static/"

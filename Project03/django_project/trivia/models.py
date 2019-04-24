@@ -20,30 +20,22 @@ class TriviaQuestion(models.Model):
     choice4 = models.TextField()
     correctChoice = models.IntegerField()
 
+class Player(models.Model):
+    id = models.AutoField(primary_key=True)
+    user = models.ForeignKey(User,on_delete=models.CASCADE)
+    game = models.ForeignKey('Game',null=True,on_delete=models.CASCADE)
+    choice = models.IntegerField(default=None,null=True)
+    score = models.IntegerField(default=0)
+
 class Game(models.Model):
     id = models.AutoField(primary_key=True)
     status = models.IntegerField(default=0)
-    p1 = models.OneToOneField(User,
-                                on_delete=models.CASCADE,
-                                related_name='p1')
-    p2 = models.OneToOneField(User,
-                                on_delete=models.CASCADE,
-                                related_name='p2',
-                                default=None,
-                                null=True
-                                )
-    p1lives = models.IntegerField(default=2)
-    p2lives = models.IntegerField(default=2)
-    p1choice = models.IntegerField(default=0)
-    p2choice = models.IntegerField(default=0)
-    questionNum = models.IntegerField(default=0)
-    question = models.ForeignKey(TriviaQuestion,
-                                on_delete=models.CASCADE,
-                                related_name='triviaQuestion')
-    timeUpdated = models.DateTimeField(auto_now=True)
-    winner = models.IntegerField(default=0)
-
-
+    p1 = models.ForeignKey(Player,related_name='gamep1',on_delete=models.CASCADE)
+    p2 = models.ForeignKey(Player,related_name='gamep2',default=None,null=True,on_delete=models.CASCADE)
+    questionNum = models.IntegerField(default=1)
+    question = models.ForeignKey(TriviaQuestion,null=True,on_delete=models.SET_NULL)
+    questionTime = models.IntegerField(default=0)
+    winner = models.ForeignKey(Player,related_name='gamewinner',null=True,on_delete=models.CASCADE)
 
 @receiver(post_save, sender=User)
 def create_user_info(sender, instance, created, **kwargs):

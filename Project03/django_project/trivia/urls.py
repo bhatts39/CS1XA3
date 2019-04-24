@@ -3,9 +3,14 @@ from . import views
 
 urlpatterns = [
 	path('', views.home_view, name='home'),
-	path('login/', views.login_view, name='login'),
-	path('logout/', views.logout_view, name='logout'),
 	path('register/', views.register_view, name='register'),
-	path('findgame/', views.findgame_view, name='findgame'),
-	path('gameinfo/', views.gameinfo_view, name='gameinfo'),
+	path('login/', views.login_view, name='login'),
+	path('api/login/', views.login_api_view, name='loginapi'),
+	path('api/logout/', views.logout_api_view, name='logoutapi'),
+	path('api/register/', views.register_api_view, name='registerapi'),
+	path('api/findgame/', views.findgame_view, name='findgameapi'),
+	path('api/gameinfo/', views.gameinfo_view, name='gameinfoapi'),
+	path('api/getquestion/', views.getquestion_view, name='getquestionapi'),
+	path('api/selectanswer/', views.selectanswer_view, name='selectanswerapi'),
+	path('api/wait/', views.wait_view, name='waitapi')
 ]
