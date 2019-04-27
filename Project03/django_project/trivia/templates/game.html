@@ -3,6 +3,8 @@
 
 {% block content %}
 
+<audio id="correct"><source src="../static/correct.mp3" type="audio/mp3"></audio>
+<audio id="incorrect"><source src="../static/incorrect.mp3" type="audio/mp3"></audio>
 <div class="container w-100">
   <div class="box box-shadow bg-white rounded mx-auto mt-5 p-4" style="width:65rem;">
     <div id="game">
@@ -38,72 +40,126 @@
       </div>
     </div>
     <div id="result" class="p-4 d-none mx-auto text-center">
-      <div id="winnertext" class="font-weight-bold text-uppercase text-dark" style="font-size:2rem"></div>
+      <div class="font-weight-bold text-uppercase text-dark" style="font-size:2rem">YOU <span id="winnertext"></span>!</div>
       <button class="mt-3 btn btn-lg text-light playerchoice" onclick="location.href='../'">Go back</button>
     </div>
   </div>
 </div>
 
 <script>
+  //global vars
   var questionid = 0;
   var gameDisabled = false;
-  
-  getGameData();
-  wait();
 
+  getGameData();
+
+  //create the circles indicating each player's points
   for (var i=1;i<6;i++) {
       $('#opponentpoints').append('<div class="greycircle" id="op'+i+'"></div>');
       $('#playerpoints').append('<div class="greycircle" id="cp'+i+'""></div>');
   }
 
+  function nextQuestion() {
+    //set a delay before moving to next question
+    setTimeout(function() {
+      //reset the colors for all choices
+      for (var i=1;i<=4;i++) {
+        $('.oppchoice.c'+i).removeClass('bg-red bg-green')
+        $('.playerchoice.c'+i).removeClass('bg-red bg-green bg-disabled')
+      }
+      //get new game data
+      getGameData();
+    },1500);
+  }
+
+  
+  function endGame(result) {
+    $('#game').addClass('d-none')
+    $('#result').removeClass('d-none')
+    $('#winnertext').html(result)
+  }
+
+
+  //long-polling method that waits for opponent to select an answer, or for the next question
   function wait() {
     $.post( "../api/wait/", { pid: {{ playerid }}, qid: questionid })
-    .done(function(data,statusText,xhr) {
+    .done(function(data) {
+      
+      gameDisabled = true //disable the game until new question appears, to prevent user from answering the wrong q
+
       if(data.result == 'opponentcorrect')  {
         $('.oppchoice.c'+data.opponentAnswer).addClass('bg-green');
-      } else if(data.result == 'usercorrect') {
+        //if the opponent has won, end the game
+        if(data.status == 2) {
+          setTimeout(function() {
+            endGame('LOSE')
+          },1000);
+        }
+      } 
+
+      else if(data.result == 'usercorrect') {
+        //set a delay for showing opponents answer identical to delay for user answer (just for look and feel)
         setTimeout(function() {
           $('.oppchoice.c'+data.opponentAnswer).addClass('bg-red');
-        },300);
-      } else if(data.result == 'bothincorrect') {
+        },400);
+      } 
+
+      else if(data.result == 'bothincorrect') {
         $('.oppchoice.c'+data.opponentAnswer).addClass('bg-red');
-      } else if(data.result == 'nextquestion') {
+      } 
+
+      else if(data.result == 'nextquestion') {
           nextQuestion();
       }
-      wait();
+
+      //dont call wait right away if game is currently changing the question
+      if(data.result != 'nextquestion')
+        wait(); //call wait again to have continuous communication with the server
     })
+    //if the server times out, call wait again
     .fail(function(xhr,status,error) {
       wait();
     });
   }
 
   function selectAnswer(choice) {
+    //only allow for selecting answer if game is not disabled (i.e. player hasn't selected an answer yet)
     if(!gameDisabled) {
       for (var i=1;i<=4;i++) {
         if (i != choice) 
-          $('.playerchoice.c'+i).addClass('bg-disabled');
+          $('.playerchoice.c'+i).addClass('bg-disabled'); //set all other choices color to grey
         else 
-          $('.playerchoice.c'+i).addClass('bg-yellow');
+          $('.playerchoice.c'+i).addClass('bg-yellow'); //set selected choice color to yellow
       }   
       $.post( "../api/selectanswer/", { playerid: {{ playerid }}, choice:choice, questionid:questionid })
       .done(function(data) {
+
         gameDisabled = true
+
+        //set a slight delay before showing user if they are right or wrong
         setTimeout(function() {
           $('.playerchoice.c'+choice).removeClass('bg-yellow');
+
           if(data.result == 'incorrect') {
+            $('#incorrect').trigger('play'); 
             $('.playerchoice.c'+choice).addClass('bg-red');
             $('.playerchoice.c'+data.correctAnswer).removeClass('bg-disabled');
             $('.playerchoice.c'+data.correctAnswer).addClass('bg-green');
           } 
+
           else if(data.result == 'correct') {
+            $('#correct').trigger('play'); 
             $('.playerchoice.c'+choice).addClass('bg-green');
+            //if user is correct and they have won the game, end the game
             if(data.winner=='true') {
-              endGame('{{ user.username }}');
+              endGame('WIN');
             }
           } 
+          //if an error occurs while selecting answer
           else {
              $('.playerchoice.c'+choice).addClass('bg-disabled');
           }
+
         },400);
       });
     }
@@ -112,10 +168,10 @@
   function getGameData() {
      $.post( "../api/gameinfo/", { pid: {{ playerid }} })
     .done(function(data) {
-      gameDisabled = false
-      if(data.status == 2 && data.opponentPoints == 5) {
-        endGame($('#opponentname').text())
-      }
+
+      gameDisabled = false //re-enable answer selection
+      
+      //update question, category, points, and other game info in the UI
       $('#category').html(data.question.category);
       $('#question').html(data.question.question);
       for (i=1;i<5;i++) {
@@ -129,24 +185,10 @@
       for (var i=1;i<=data.opponentPoints;i++) {
         $('#op'+i).addClass('bg-green');
       }
+      gameDisabled = false
+      wait(); //call wait once the new question has been retrieved
+
     });
-
-    
-  function nextQuestion() {
-    setTimeout(function() {
-      for (var i=1;i<=4;i++) {
-        $('.oppchoice.c'+i).removeClass('bg-red bg-green')
-        $('.playerchoice.c'+i).removeClass('bg-red bg-green bg-disabled')
-      }
-      getGameData();
-    },1500);
-  }
-
-  function endGame(winnername) {
-    $('#game').addClass('d-none')
-    $('#result').removeClass('d-none')
-    $('#winnertext').html(winnername + ' WINS!')
-  }
 
   }
 </script>

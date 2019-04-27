@@ -21,30 +21,38 @@
 
 <script>
   var playerid = -1
-
+  
+  findGame()
+  $('#cancel').click(cancelFind); //bind cancelFind function to onclick of cancel button
+  
   function findGame() {
+    //call findgame api
     $.post( "../api/findgame/")
     .done(function(data) {
-      playerid = data.playerid
+      playerid = data.playerid //get newly generated playerid
+      //if game is in waiting status
       if (data.status == 0) {
-        setInterval(function(){ 
-            $.post( "../api/gameinfo/", {pid : data.playerid})
-            .done(function(info) {
-              if (info.status==1) {
-                window.location.replace('../game/?pid='+data.playerid)
-              }
-            });
-        }, 800);
+        waitForOpponent();
       } else if(data.status == 1) {
+        //if you joined an opponent's game, start the game
         window.location.replace('../game/?pid='+data.playerid)
       }
     });
   }
 
-  findGame()
+  function waitForOpponent() {
+    $.post( "../api/gameinfo/", {pid : playerid})
+    .done(function(info) {
+      //if opponent joined
+      if (info.status==1) {
+        window.location.replace('../game/?pid='+playerid)
+      } else {
+        waitForOpponent();
+      }
+    });
+  }
 
-  $('#cancel').click(cancelFind);
-
+  //if user cancels game redirect to homepage
   function cancelFind() {
     $.post( "../api/cancelgame/", { playerid: playerid})
     .done(function( data ) {

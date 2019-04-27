@@ -12,7 +12,6 @@ urlpatterns = [
 	path('api/register/', views.register_api_view, name='registerapi'),
 	path('api/findgame/', views.findgame_view, name='findgameapi'),
 	path('api/gameinfo/', views.gameinfo_view, name='gameinfoapi'),
-	path('api/getquestion/', views.getquestion_view, name='getquestionapi'),
 	path('api/selectanswer/', views.selectanswer_view, name='selectanswerapi'),
 	path('api/wait/', views.wait_view, name='waitapi'),
 	path('api/cancelgame/', views.cancelgame_view, name='cancelapi'),
