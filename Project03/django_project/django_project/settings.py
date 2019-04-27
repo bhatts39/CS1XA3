@@ -119,9 +119,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/e/bhatts39/static/' 
-    # url to automatically access static files from
 STATICFILES_DIRS = [
-    "/home/bhatts39/CS1XA3/Project03/django_project/static",
-    # paths to collect static files from
+    BASE_DIR + "/static",
 ]
-STATIC_ROOT = "/home/bhatts39/CS1XA3/Project03/django_project/trivia/static/"
+STATIC_ROOT = BASE_DIR + "/trivia/static/"
