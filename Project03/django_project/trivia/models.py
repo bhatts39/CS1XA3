@@ -26,6 +26,7 @@ class Player(models.Model):
     game = models.ForeignKey('Game',null=True,on_delete=models.CASCADE)
     choice = models.IntegerField(default=None,null=True)
     score = models.IntegerField(default=0)
+    next = models.BooleanField(default=False )
 
 class Game(models.Model):
     id = models.AutoField(primary_key=True)
