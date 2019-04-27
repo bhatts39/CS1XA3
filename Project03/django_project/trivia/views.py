@@ -153,13 +153,12 @@ def getquestion_view(request):
             return JsonResponse(model_to_dict(triviaQ))
         except ObjectDoesNotExist:
             return JsonResponse({'error':'question not found'})
-
-#todo opponentcorrect not showing up sometimes for p2
-#add sounds
+            
 @csrf_exempt
 def wait_view(request):
      if request.method == "POST" and request.user.is_authenticated:
         playerid = int(request.POST['pid'])
+        questionid = int(request.POST['qid'])
 
         try:
             player = Player.objects.get(id=playerid)
@@ -170,32 +169,36 @@ def wait_view(request):
             return JsonResponse({'result':'error'})
         
         opponent = player.game.p1 if player == player.game.p2 else player.game.p2
-        questionNum = player.game.questionNum
 
         while(True):
             player.refresh_from_db()
             opponent.refresh_from_db()
 
-            if (player.next and opponent.next) or (player.game.questionNum > questionNum):
+            if player.game.question.id != questionid:
+                player.choice = None
                 player.next = False
-                if player == player.game.p1:
-                    player.choice = None
-                    opponent.choice = None
-                    player.save()
-                    opponent.save()
-                    nextQuestion(player.game)
-                    time.sleep(1)
+                player.save()
+                return JsonResponse({'result':'nextquestion'})
+
+            if player.next and opponent.next:
+                player.choice = None
+                player.next = False
+                player.save()
+                nextQuestion(player.game)
                 return JsonResponse({'result':'nextquestion'})
 
             if player.choice == player.game.question.correctChoice:
+                print(player.user.username,'set to true, usercorrect')
                 player.next = True
                 player.save()
                 return JsonResponse({'result':'usercorrect','opponentAnswer':opponent.choice,'status':player.game.status})
             elif opponent.choice == player.game.question.correctChoice:
+                print(player.user.username,'set to true, opponentcorrect')
                 player.next = True
                 player.save()
                 return JsonResponse({'result':'opponentcorrect','opponentAnswer':opponent.choice,'status':player.game.status})
             elif player.choice is not None and opponent.choice is not None:
+                print(player.user.username,'set to true')
                 player.next = True
                 player.save()
                 return JsonResponse({'result':'bothincorrect','opponentAnswer':opponent.choice,'status':player.game.status})
@@ -239,7 +242,7 @@ def selectanswer_view(request):
         if(player.score > 4):
             player.game.winner = player
             player.game.status = 2
-            player.user.points += 1
+            player.user.info.points += 1
             player.game.save()
             winner = 'true'
         else:
@@ -260,7 +263,7 @@ def nextQuestion(game):
     game.save()
 
 def newTriviaQuestion():
-    response = requests.get("https://opentdb.com/api.php?amount=1&difficulty=medium&type=multiple")
+    response = requests.get("https://opentdb.com/api.php?amount=1&difficulty=easy&type=multiple")
     data = json.loads(response.text).get('results')[0]
     question = data.get('question')
     correctChoice = random.randint(0,3)

@@ -6,6 +6,7 @@
 <div class="container w-100">
   <div class="box box-shadow bg-white rounded mx-auto mt-5 p-4" style="width:65rem;">
     <div id="game">
+      <div class="mb-4 font-weight-bold text-dark mx-auto text-center" style="font-size: 1.5rem">Category: <span id="category"></span></div>
       <div id="question" class="mb-4 font-weight-bold text-dark mx-auto text-center"></div>
       <div class="row">
         <div class="col-4 border-right py-5 px-4">
@@ -45,18 +46,18 @@
 
 <script>
   var questionid = 0;
-  var playerScore = 0;
-  var opponentScore = 0;
   var gameDisabled = false;
+  
   getGameData();
   wait();
+
   for (var i=1;i<6;i++) {
       $('#opponentpoints').append('<div class="greycircle" id="op'+i+'"></div>');
       $('#playerpoints').append('<div class="greycircle" id="cp'+i+'""></div>');
   }
 
   function wait() {
-    $.post( "../api/wait/", { pid: {{ playerid }} })
+    $.post( "../api/wait/", { pid: {{ playerid }}, qid: questionid })
     .done(function(data,statusText,xhr) {
       if(data.result == 'opponentcorrect')  {
         $('.oppchoice.c'+data.opponentAnswer).addClass('bg-green');
@@ -76,16 +77,6 @@
     });
   }
 
-  function nextQuestion() {
-    setTimeout(function() {
-      for (var i=1;i<=4;i++) {
-        $('.oppchoice.c'+i).removeClass('bg-red bg-green')
-        $('.playerchoice.c'+i).removeClass('bg-red bg-green bg-disabled')
-      }
-      getGameData();
-    },1500);
-  }
-
   function selectAnswer(choice) {
     if(!gameDisabled) {
       for (var i=1;i<=4;i++) {
@@ -96,36 +87,36 @@
       }   
       $.post( "../api/selectanswer/", { playerid: {{ playerid }}, choice:choice, questionid:questionid })
       .done(function(data) {
+        gameDisabled = true
         setTimeout(function() {
           $('.playerchoice.c'+choice).removeClass('bg-yellow');
           if(data.result == 'incorrect') {
             $('.playerchoice.c'+choice).addClass('bg-red');
             $('.playerchoice.c'+data.correctAnswer).removeClass('bg-disabled');
             $('.playerchoice.c'+data.correctAnswer).addClass('bg-green');
-          }
+          } 
           else if(data.result == 'correct') {
             $('.playerchoice.c'+choice).addClass('bg-green');
             if(data.winner=='true') {
               endGame('{{ user.username }}');
             }
+          } 
+          else {
+             $('.playerchoice.c'+choice).addClass('bg-disabled');
           }
         },400);
       });
     }
   }
 
-  function endGame(winnername) {
-    $('#game').addClass('d-none')
-    $('#result').removeClass('d-none')
-    $('#winnertext').html(winnername + ' WINS!')
-  }
-
   function getGameData() {
      $.post( "../api/gameinfo/", { pid: {{ playerid }} })
     .done(function(data) {
-        if(data.status == 2 && data.opponentPoints == 5) {
-          endGame($('#opponentname').text())
-        }
+      gameDisabled = false
+      if(data.status == 2 && data.opponentPoints == 5) {
+        endGame($('#opponentname').text())
+      }
+      $('#category').html(data.question.category);
       $('#question').html(data.question.question);
       for (i=1;i<5;i++) {
         $('.c'+i).html(data.question['choice'+i]);
@@ -139,6 +130,24 @@
         $('#op'+i).addClass('bg-green');
       }
     });
+
+    
+  function nextQuestion() {
+    setTimeout(function() {
+      for (var i=1;i<=4;i++) {
+        $('.oppchoice.c'+i).removeClass('bg-red bg-green')
+        $('.playerchoice.c'+i).removeClass('bg-red bg-green bg-disabled')
+      }
+      getGameData();
+    },1500);
+  }
+
+  function endGame(winnername) {
+    $('#game').addClass('d-none')
+    $('#result').removeClass('d-none')
+    $('#winnertext').html(winnername + ' WINS!')
+  }
+
   }
 </script>
 

@@ -140,7 +140,17 @@ font-size: 1.15rem !important;
 }
 
 .bg-disabled {
-    background: #8b9299;
+    background: #8b9299 !important;
+    cursor: default;
+}
+
+.bg-disabled:hover {
+    background: #8b9299 !important;
+}
+
+.bg-disabled:active {
+    background: #8b9299 !important;
+
 }
 
 .greycircle {
