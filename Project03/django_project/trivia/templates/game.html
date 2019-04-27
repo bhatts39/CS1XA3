@@ -5,34 +5,40 @@
 
 <div class="container w-100">
   <div class="box box-shadow bg-white rounded mx-auto mt-5 p-4" style="width:65rem;">
-    <div id="question" class="mb-4 font-weight-bold text-dark mx-auto text-center"></div>
-    <div class="row">
-      <div class="col-4 border-right py-5 px-4">
-        <div id="pc1" class="choice p-2 text-white playerchoice mb-3 c1" onclick='selectAnswer(1)'></div> 
-        <div id="pc2" class="choice p-2 text-white playerchoice mb-3 c2" onclick='selectAnswer(2)'></div>
-        <div id="pc3" class="choice p-2 text-white playerchoice mb-3 c3" onclick='selectAnswer(3)'></div>
-        <div id="pc4" class="choice p-2 text-white playerchoice mb-3 c4" onclick='selectAnswer(4)'></div>
-      </div>
-
-      <div class="col-4 py-5 text-center">
-        <div id="playername" class="font-weight-bold text-uppercase text-dark p-2" style="font-size:2rem">
-          {{ user.username }}
-        </div>
-        <div id="playerpoints">
+    <div id="game">
+      <div id="question" class="mb-4 font-weight-bold text-dark mx-auto text-center"></div>
+      <div class="row">
+        <div class="col-4 border-right py-5 px-4">
+          <div id="pc1" class="choice p-2 text-white playerchoice mb-3 c1" onclick='selectAnswer(1)'></div> 
+          <div id="pc2" class="choice p-2 text-white playerchoice mb-3 c2" onclick='selectAnswer(2)'></div>
+          <div id="pc3" class="choice p-2 text-white playerchoice mb-3 c3" onclick='selectAnswer(3)'></div>
+          <div id="pc4" class="choice p-2 text-white playerchoice mb-3 c4" onclick='selectAnswer(4)'></div>
         </div>
 
-        <div id="opponentname" class="font-weight-bold text-uppercase text-dark p-2 mt-5" style="font-size:2rem">
-        </div>
-        <div id="opponentpoints">
-        </div>
-      </div>
+        <div class="col-4 py-5 text-center">
+          <div id="playername" class="font-weight-bold text-uppercase text-dark p-2" style="font-size:2rem">
+            {{ user.username }}
+          </div>
+          <div id="playerpoints">
+          </div>
 
-      <div class="col-4 border-left py-5 px-4">
-        <div id="oc1" class="choice p-2 text-white oppchoice mb-3 c1"></div>
-        <div id="oc2" class="choice p-2 text-white oppchoice mb-3 c2"></div>
-        <div id="oc3" class="choice p-2 text-white oppchoice mb-3 c3"></div>
-        <div id="oc4" class="choice p-2 text-white oppchoice mb-3 c4"></div>
+          <div id="opponentname" class="font-weight-bold text-uppercase text-dark p-2 mt-5" style="font-size:2rem">
+          </div>
+          <div id="opponentpoints">
+          </div>
+        </div>
+
+        <div class="col-4 border-left py-5 px-4">
+          <div id="oc1" class="choice p-2 text-white oppchoice mb-3 c1"></div>
+          <div id="oc2" class="choice p-2 text-white oppchoice mb-3 c2"></div>
+          <div id="oc3" class="choice p-2 text-white oppchoice mb-3 c3"></div>
+          <div id="oc4" class="choice p-2 text-white oppchoice mb-3 c4"></div>
+        </div>
       </div>
+    </div>
+    <div id="result" class="p-4 d-none mx-auto text-center">
+      <div id="winnertext" class="font-weight-bold text-uppercase text-dark" style="font-size:2rem"></div>
+      <button class="mt-3 btn btn-lg text-light playerchoice" onclick="location.href='../'">Go back</button>
     </div>
   </div>
 </div>
@@ -44,7 +50,7 @@
   var gameDisabled = false;
   getGameData();
   wait();
-  for (var i=1;i<11;i++) {
+  for (var i=1;i<6;i++) {
       $('#opponentpoints').append('<div class="greycircle" id="op'+i+'"></div>');
       $('#playerpoints').append('<div class="greycircle" id="cp'+i+'""></div>');
   }
@@ -55,12 +61,17 @@
       if(data.result == 'opponentcorrect')  {
         $('.oppchoice.c'+data.opponentAnswer).addClass('bg-green');
       } else if(data.result == 'usercorrect') {
-        $('.oppchoice.c'+data.opponentAnswer).addClass('bg-red');
+        setTimeout(function() {
+          $('.oppchoice.c'+data.opponentAnswer).addClass('bg-red');
+        },300);
       } else if(data.result == 'bothincorrect') {
         $('.oppchoice.c'+data.opponentAnswer).addClass('bg-red');
       } else if(data.result == 'nextquestion') {
           nextQuestion();
       }
+      wait();
+    })
+    .fail(function(xhr,status,error) {
       wait();
     });
   }
@@ -72,7 +83,7 @@
         $('.playerchoice.c'+i).removeClass('bg-red bg-green bg-disabled')
       }
       getGameData();
-    },4000);
+    },1500);
   }
 
   function selectAnswer(choice) {
@@ -85,26 +96,36 @@
       }   
       $.post( "../api/selectanswer/", { playerid: {{ playerid }}, choice:choice, questionid:questionid })
       .done(function(data) {
-        $('.playerchoice.c'+choice).removeClass('bg-yellow');
-        if(data.result == 'incorrect') {
-          $('.playerchoice.c'+choice).addClass('bg-red');
-          $('.playerchoice.c'+data.correctAnswer).removeClass('bg-disabled');
-          $('.playerchoice.c'+data.correctAnswer).addClass('bg-green');
-        }
-        else if(data.result == 'correct') {
-          $('.playerchoice.c'+choice).addClass('bg-green');
-        }
+        setTimeout(function() {
+          $('.playerchoice.c'+choice).removeClass('bg-yellow');
+          if(data.result == 'incorrect') {
+            $('.playerchoice.c'+choice).addClass('bg-red');
+            $('.playerchoice.c'+data.correctAnswer).removeClass('bg-disabled');
+            $('.playerchoice.c'+data.correctAnswer).addClass('bg-green');
+          }
+          else if(data.result == 'correct') {
+            $('.playerchoice.c'+choice).addClass('bg-green');
+            if(data.winner=='true') {
+              endGame('{{ user.username }}');
+            }
+          }
+        },400);
       });
     }
   }
 
-  function endGame() {
-  
+  function endGame(winnername) {
+    $('#game').addClass('d-none')
+    $('#result').removeClass('d-none')
+    $('#winnertext').html(winnername + ' WINS!')
   }
 
   function getGameData() {
      $.post( "../api/gameinfo/", { pid: {{ playerid }} })
     .done(function(data) {
+        if(data.status == 2 && data.opponentPoints == 5) {
+          endGame($('#opponentname').text())
+        }
       $('#question').html(data.question.question);
       for (i=1;i<5;i++) {
         $('.c'+i).html(data.question['choice'+i]);

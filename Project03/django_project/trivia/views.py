@@ -85,7 +85,7 @@ def register_api_view(request):
 @csrf_exempt
 def findgame_view(request):
     if(request.user.is_authenticated):
-        game = Game.objects.filter((Q(status=0) | Q(status=1)) & Q(p1__user=request.user) | Q(p2__user=request.user)).first()
+        game = Game.objects.filter((Q(status=0) | Q(status=1)) & (Q(p1__user=request.user) | Q(p2__user=request.user))).first()
         if game is not None:
             pid = game.p1.id if game.p1.user == request.user else game.p2.id
             return JsonResponse({'status':game.status,'playerid':pid})
@@ -154,13 +154,8 @@ def getquestion_view(request):
         except ObjectDoesNotExist:
             return JsonResponse({'error':'question not found'})
 
-#long polling
-
-#refactor
-#if both players are ready for next move
-#set next to False for both players
-#if player is player1 (host), call nextQuestion()
-
+#todo opponentcorrect not showing up sometimes for p2
+#add sounds
 @csrf_exempt
 def wait_view(request):
      if request.method == "POST" and request.user.is_authenticated:
@@ -204,7 +199,7 @@ def wait_view(request):
                 player.next = True
                 player.save()
                 return JsonResponse({'result':'bothincorrect','opponentAnswer':opponent.choice,'status':player.game.status})
-            time.sleep(0.5)
+            time.sleep(0.2)
     
 
 @csrf_exempt
@@ -241,9 +236,11 @@ def selectanswer_view(request):
         #player chose correct anwer
         player.score += 1
         #game over
-        if(player.score > 6):
+        if(player.score > 4):
             player.game.winner = player
             player.game.status = 2
+            player.user.points += 1
+            player.game.save()
             winner = 'true'
         else:
             winner = 'false'
