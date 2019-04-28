@@ -27,4 +27,7 @@ All client-server interaction is done through web requests, using AJAX as well a
 * If neither player answers correctly, nobody gets a points
 * First player to 5 points wins
 
-
+#### Screenshots
+![](https://i.imgur.com/WGW4fwt.png)
+![](https://i.imgur.com/ex7CCo3.png)
+![](https://i.imgur.com/zI1Ov9d.png)
