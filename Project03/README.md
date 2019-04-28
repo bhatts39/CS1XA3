@@ -12,6 +12,7 @@ Project03 is an authenticated two player live trivia game.
 * 1v1 matchmaking
 * Live two-player trivia (first to answer question wins)
 * Ability to view opponent's answer
+* Ability to close tab and re-join game
 * Leaderboard of top players
 <br/><br/>
 * AJAX requests
