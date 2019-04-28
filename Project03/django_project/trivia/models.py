@@ -33,7 +33,6 @@ class Game(models.Model):
     status = models.IntegerField(default=0)
     p1 = models.ForeignKey(Player,related_name='gamep1',on_delete=models.CASCADE)
     p2 = models.ForeignKey(Player,related_name='gamep2',default=None,null=True,on_delete=models.CASCADE)
-    questionNum = models.IntegerField(default=1)
     question = models.ForeignKey(TriviaQuestion,null=True,on_delete=models.SET_NULL)
     questionTime = models.IntegerField(default=0)
     winner = models.ForeignKey(Player,related_name='gamewinner',null=True,on_delete=models.CASCADE)

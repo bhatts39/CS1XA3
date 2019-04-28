@@ -40,8 +40,16 @@
       </div>
     </div>
     <div id="result" class="p-4 d-none mx-auto text-center">
-      <div class="font-weight-bold text-uppercase text-dark" style="font-size:2rem">YOU <span id="winnertext"></span>!</div>
-      <button class="mt-3 btn btn-lg text-light playerchoice" onclick="location.href='../'">Go back</button>
+      <div id="youwin" class="d-none">
+        <div class="font-weight-bold text-uppercase text-dark" style="font-size:2rem">YOU WIN!</div>
+        <img src="../static/winner.gif" class="px-3 d-block mx-auto"/>
+        <button class="mt-3 btn btn-lg text-light playerchoice" onclick="location.href='../'">Go back</button>
+      </div>
+      <div id="youlose" class="d-none">
+        <div class="font-weight-bold text-uppercase text-dark" style="font-size:2rem">YOU LOSE!</div>
+        <div class="font-weight-bold text-dark mx-3 my-4 d-block">Better luck next time.</div>
+        <button class="mt-3 btn btn-lg text-light playerchoice" onclick="location.href='../'">Go back</button>
+      </div>
     </div>
   </div>
 </div>
@@ -76,6 +84,7 @@
   function endGame(result) {
     $('#game').addClass('d-none')
     $('#result').removeClass('d-none')
+    $('#you'+result).removeClass('d-none')
     $('#winnertext').html(result)
   }
 
@@ -92,7 +101,7 @@
         //if the opponent has won, end the game
         if(data.status == 2) {
           setTimeout(function() {
-            endGame('LOSE')
+            endGame('lose')
           },1000);
         }
       } 
@@ -152,7 +161,7 @@
             $('.playerchoice.c'+choice).addClass('bg-green');
             //if user is correct and they have won the game, end the game
             if(data.winner=='true') {
-              endGame('WIN');
+              endGame('win');
             }
           } 
           //if an error occurs while selecting answer

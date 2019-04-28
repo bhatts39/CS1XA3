@@ -107,7 +107,6 @@ def gameinfo_view(request):
                                 'opponentName':opponent.user.username,
                                 'opponentPoints':opponent.score,
                                 'playerPoints':player.score,
-                                'questionNum':game.questionNum,
                                 'questionTime':game.questionTime}) 
         else: 
             return JsonResponse({'error':'game not found'})
@@ -207,7 +206,7 @@ def selectanswer_view(request):
         player.score += 1
 
         #if the player has reached winning score
-        if(player.score > 4):
+        if player.score > 1:
             player.game.winner = player
             player.game.status = 2
             player.user.info.points += 1
@@ -226,7 +225,6 @@ def selectanswer_view(request):
 def nextQuestion(game):
     game.question = newTriviaQuestion() 
     game.questionTime = int(time.time()*1000)
-    game.questionNum += 1
     game.save()
 
 def newTriviaQuestion():
