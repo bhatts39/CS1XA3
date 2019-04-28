@@ -206,7 +206,7 @@ def selectanswer_view(request):
         player.score += 1
 
         #if the player has reached winning score
-        if player.score > 1:
+        if player.score > 4:
             player.game.winner = player
             player.game.status = 2
             player.user.info.points += 1
